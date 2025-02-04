@@ -75,10 +75,6 @@ export async function* createCompletionResponseStreaming(
 ): StreamCompletionResponse {
   let message: Message | undefined
 
-  if (message === undefined) {
-    throw new InvariantError(`Message is undefined.`)
-  }
-
   // We manually keep track of the tool call index because some providers, like Anthropic, start
   // with a tool call index of 1 because they're preceded by a text block that has an index of 0 in
   // the `response`. Since OpenAI's tool call index starts with 0, we also enforce that convention
