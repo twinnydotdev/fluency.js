@@ -16,6 +16,15 @@ export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {
     accessKeyId?: string
     secretAccessKey?: string
   }
+  anthropic?: {
+    caching?: {
+      systemMessage?: boolean
+      tools?: boolean
+      messages?: boolean
+      images?: boolean
+      toolUse?: boolean
+    }
+  }
 }
 
 export type ChatCompletionChoice = Omit<
