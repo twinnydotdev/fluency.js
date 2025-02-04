@@ -1,17 +1,20 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { BetaMessageStream } from '@anthropic-ai/sdk/lib/BetaMessageStream.mjs'
 import {
-  ContentBlock,
+  BetaTextBlockParam,
+  BetaTextDelta,
+  MessageCreateParamsNonStreaming,
+} from '@anthropic-ai/sdk/resources/beta/index.mjs'
+import {
   ImageBlockParam,
   Message,
-  MessageCreateParamsNonStreaming,
-  MessageCreateParamsStreaming,
-  MessageStream,
   TextBlock,
   TextBlockParam,
   ToolResultBlockParam,
-  ToolUseBlock,
   ToolUseBlockParam,
-} from '@anthropic-ai/sdk/resources/messages'
+} from '@anthropic-ai/sdk/resources/index.mjs'
+import { MessageCreateParamsStreaming } from '@anthropic-ai/sdk/src/resources/beta/index.js'
+import { ContentBlock } from '@anthropic-ai/sdk/src/resources/index.js'
 import { ChatCompletionMessageToolCall } from 'openai/resources/index'
 
 import {
@@ -28,7 +31,6 @@ import { BaseHandler } from './base.js'
 import { InputError, InvariantError } from './types.js'
 import {
   consoleWarn,
-  convertMessageContentToString,
   fetchThenParseImage,
   getTimestamp,
   isEmptyObject,
@@ -68,7 +70,7 @@ export const createCompletionResponseNonStreaming = (
 }
 
 export async function* createCompletionResponseStreaming(
-  response: MessageStream,
+  response: BetaMessageStream,
   created: number
 ): StreamCompletionResponse {
   let message: Message | undefined
@@ -83,6 +85,7 @@ export async function* createCompletionResponseStreaming(
     if (chunk.type === 'message_start') {
       message = chunk.message
       // Yield the first element
+
       yield {
         choices: [
           {
@@ -99,10 +102,6 @@ export async function* createCompletionResponseStreaming(
         id: message.id,
         object: 'chat.completion.chunk',
       }
-    }
-
-    if (message === undefined) {
-      throw new InvariantError(`Message is undefined.`)
     }
 
     let newStopReason: Message['stop_reason'] | undefined
@@ -155,12 +154,17 @@ export async function* createCompletionResponseStreaming(
           ],
         }
       } else {
+        const betaTextDelta = chunk.delta as BetaTextDelta
         delta = {
-          content: chunk.delta.text,
+          content: betaTextDelta.text,
         }
       }
     } else if (chunk.type === 'message_delta') {
       newStopReason = chunk.delta.stop_reason
+    }
+
+    if (message === undefined) {
+      throw new InvariantError(`Message is undefined.`)
     }
 
     const stopReason =
@@ -192,7 +196,7 @@ const isTextBlock = (contentBlock: ContentBlock): contentBlock is TextBlock => {
 
 const isToolUseBlock = (
   contentBlock: ContentBlock
-): contentBlock is ToolUseBlock => {
+): contentBlock is Anthropic.Messages.ToolUseBlock => {
   return contentBlock.type === 'tool_use'
 }
 
@@ -353,7 +357,7 @@ export const convertMessages = async (
   messages: CompletionParams['messages']
 ): Promise<{
   messages: MessageCreateParamsNonStreaming['messages']
-  systemMessage: string | undefined
+  systemMessage: string | undefined | BetaTextBlockParam[]
 }> => {
   const output: MessageCreateParamsNonStreaming['messages'] = []
   const clonedMessages = structuredClone(messages)
@@ -362,10 +366,25 @@ export const convertMessages = async (
   // message. The returned element will be used for Anthropic's `system` parameter. We only pop the
   // system message if it's the first element in the array so that the order of the messages remains
   // unchanged.
-  let systemMessage: string | undefined
-  if (clonedMessages.length > 0 && clonedMessages[0].role === 'system') {
-    systemMessage = convertMessageContentToString(clonedMessages[0].content)
-    clonedMessages.shift()
+  let systemMessage: string | undefined | BetaTextBlockParam[]
+
+  const systemMessages = clonedMessages.filter(
+    (message) => message.role === 'system'
+  )
+
+  if (
+    systemMessages.length &&
+    systemMessages.some((message) => message.cache_control)
+  ) {
+    systemMessage = systemMessages.map((s) => ({
+      text: s.content as string,
+      type: 'text',
+      cache_control: {
+        type: 'ephemeral',
+      },
+    }))
+  } else if (systemMessages.length > 0) {
+    systemMessage = systemMessages[0].content
   }
 
   // Anthropic requires that the first message in the array is from a 'user' role, so we inject a
@@ -417,6 +436,11 @@ export const convertMessages = async (
         currentParams.push({
           text: message.content,
           type: 'text',
+          ...(message.cache_control && {
+            cache_control: {
+              type: 'ephemeral',
+            },
+          }),
         })
       }
 
@@ -432,25 +456,28 @@ export const convertMessages = async (
           })
         currentParams.push(...convertedContent)
       }
-    } else if (typeof message.content === 'string') {
-      const text =
-        message.role === 'system'
-          ? `System: ${message.content}`
-          : message.content
+    } else if (typeof message.content === 'string' && message.role === 'user') {
       currentParams.push({
         type: 'text',
-        text,
+        text: message.content,
+        ...(message.cache_control && {
+          cache_control: {
+            type: 'ephemeral',
+          },
+        }),
       })
     } else if (Array.isArray(message.content)) {
       const convertedContent: Array<TextBlockParam | ImageBlockParam> =
         await Promise.all(
           message.content.map(async (e) => {
             if (e.type === 'text') {
-              const text =
-                message.role === 'system' ? `System: ${e.text}` : e.text
               return {
-                type: 'text',
-                text,
+                text: e.text,
+                ...(message.cache_control && {
+                  cache_control: {
+                    type: 'ephemeral',
+                  },
+                }),
               } as TextBlockParam
             } else {
               const parsedImage = await fetchThenParseImage(e.image_url.url)
@@ -579,7 +606,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         tool_choice: toolChoice,
       }
       const created = getTimestamp()
-      const response = client.messages.stream(convertedBody)
+      const response = client.beta.messages.stream(convertedBody)
 
       return createCompletionResponseStreaming(response, created)
     } else {
@@ -596,7 +623,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
       }
 
       const created = getTimestamp()
-      const response = await client.messages.create(convertedBody)
+      const response = await client.beta.messages.create(convertedBody)
       return createCompletionResponseNonStreaming(
         response,
         created,

@@ -5,6 +5,7 @@ import { models } from '../models.js'
 import {
   CompletionResponse,
   ConfigOptions,
+  MessageWithCache,
   StreamCompletionResponse,
 } from '../userTypes/index.js'
 
@@ -55,7 +56,6 @@ type CompletionBase<P extends LLMProvider> = Pick<
   | 'top_p'
   | 'stop'
   | 'n'
-  | 'messages'
   | 'max_tokens'
   | 'response_format'
   | 'tools'
@@ -63,6 +63,7 @@ type CompletionBase<P extends LLMProvider> = Pick<
 > & {
   provider: P
   model: ProviderModelMap[P]
+  messages: MessageWithCache[]
 }
 
 export type CompletionStreaming<P extends LLMProvider> = CompletionBase<P> & {
