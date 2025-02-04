@@ -17,14 +17,29 @@ describe('convertMessages', () => {
     const output = [
       {
         role: 'user',
-        content: [
-          { type: 'text', text: 'Hi' },
-          { type: 'text', text: 'System: Bye' },
-        ],
+        content: [{ type: 'text', text: 'Hi' }],
       },
     ]
     const { systemMessage, messages } = await convertMessages(input)
-    expect(systemMessage).toEqual(undefined)
+    expect(systemMessage).toEqual('Bye')
+    expect(messages).toEqual(output)
+  })
+
+  it('converts user and system messages into correct caches', async () => {
+    const input: CompletionParams['messages'] = [
+      { role: 'user', content: 'Hi' },
+      { role: 'system', content: 'Bye', cache_control: { type: 'ephemeral' } },
+    ]
+    const output = [
+      {
+        role: 'user',
+        content: [{ type: 'text', text: 'Hi' }],
+      },
+    ]
+    const { systemMessage, messages } = await convertMessages(input)
+    expect(systemMessage).toEqual([
+      { text: 'Bye', type: 'text', cache_control: { type: 'ephemeral' } },
+    ])
     expect(messages).toEqual(output)
   })
 
@@ -84,10 +99,7 @@ describe('convertMessages', () => {
     const output = [
       {
         role: 'user',
-        content: [
-          { type: 'text', text: 'System: World' },
-          { type: 'text', text: 'Hi' },
-        ],
+        content: [{ type: 'text', text: 'Hi' }],
       },
     ]
     const { systemMessage, messages } = await convertMessages(input)

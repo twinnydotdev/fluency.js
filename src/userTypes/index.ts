@@ -3,6 +3,7 @@
  * and so that they can be easily imported and used alongside the primary LLM class.
  */
 import { ClientOptions } from 'openai'
+import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions'
 import {
   ChatCompletion,
   ChatCompletionChunk,
@@ -17,6 +18,15 @@ export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {
     secretAccessKey?: string
   }
 }
+
+export type CacheControl = {
+  cache_control?: {
+    type: 'ephemeral'
+  }
+}
+
+export type MessageWithCache =
+  ChatCompletionCreateParamsBase['messages'][number] & CacheControl
 
 export type ChatCompletionChoice = Omit<
   ChatCompletion.Choice,
@@ -48,5 +58,6 @@ export type CompletionResponseChunk = Pick<
   choices: Array<ChatCompletionChunkChoice>
 }
 export type StreamCompletionResponse = AsyncIterable<CompletionResponseChunk>
-export type ChatCompletionMessageParam = OpenAICompletionMessageParam
+export type ChatCompletionMessageParam = OpenAICompletionMessageParam &
+  CacheControl
 export type ChatCompletionTool = OpenAIChatCompletionTool
