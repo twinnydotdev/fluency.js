@@ -95,6 +95,98 @@ describe('convertMessages', () => {
     expect(messages).toEqual(output)
   })
 
+  it('includes cache control for system messages when enabled', async () => {
+    const input: CompletionParams['messages'] = [
+      { role: 'system', content: 'Hello' },
+      { role: 'user', content: 'Hi' },
+    ]
+    const { systemMessageWithCache } = await convertMessages(input, {
+      anthropic: {
+        caching: {
+          systemMessage: true,
+        },
+      },
+    })
+    expect(systemMessageWithCache).toEqual([
+      {
+        type: 'text',
+        text: 'Hello',
+        cache_control: {
+          type: 'ephemeral',
+        },
+      },
+    ])
+  })
+
+  it('includes cache control for messages when enabled', async () => {
+    const input: CompletionParams['messages'] = [
+      { role: 'user', content: 'Hi' },
+      { role: 'assistant', content: 'Hello' },
+    ]
+    const { messages } = await convertMessages(input, {
+      anthropic: {
+        caching: {
+          messages: true,
+        },
+      },
+    })
+    expect(messages[0].content[0]).toHaveProperty(
+      'cache_control.type',
+      'ephemeral'
+    )
+    expect(messages[1].content[0]).toHaveProperty(
+      'cache_control.type',
+      'ephemeral'
+    )
+  })
+
+  it('includes cache control for tools when enabled', async () => {
+    const tool = getDummyTool()
+    const { tools } = convertToolParams('auto', [tool], {
+      anthropic: {
+        caching: {
+          tools: true,
+        },
+      },
+    })
+    expect(tools![0]).toHaveProperty('cache_control.type', 'ephemeral')
+  })
+
+  it('includes cache control for tool use and results when enabled', async () => {
+    const { messages } = await convertMessages(
+      MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS,
+      {
+        anthropic: {
+          caching: {
+            toolUse: true,
+          },
+        },
+      }
+    )
+    expect(messages[1].content[1]).toHaveProperty(
+      'cache_control.type',
+      'ephemeral'
+    )
+    expect(messages[2].content[0]).toHaveProperty(
+      'cache_control.type',
+      'ephemeral'
+    )
+  })
+
+  it('does not include cache control when caching is undefined', async () => {
+    const input: CompletionParams['messages'] = [
+      { role: 'system', content: 'Hello' },
+      { role: 'user', content: 'Hi' },
+    ]
+    const { systemMessageWithCache } = await convertMessages(input, {})
+    expect(systemMessageWithCache).toEqual([
+      {
+        type: 'text',
+        text: 'Hello',
+      },
+    ])
+  })
+
   it(`converts assistant message containing tool calls followed by tool results`, async () => {
     const { systemMessage, messages } = await convertMessages(
       MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS

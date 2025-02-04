@@ -1,17 +1,19 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { BetaMessageStream } from '@anthropic-ai/sdk/lib/BetaMessageStream.mjs'
 import {
-  ContentBlock,
+  BetaTextDelta,
+  MessageCreateParamsNonStreaming,
+} from '@anthropic-ai/sdk/resources/beta/index.mjs'
+import {
   ImageBlockParam,
   Message,
-  MessageCreateParamsNonStreaming,
-  MessageCreateParamsStreaming,
-  MessageStream,
   TextBlock,
   TextBlockParam,
   ToolResultBlockParam,
-  ToolUseBlock,
   ToolUseBlockParam,
-} from '@anthropic-ai/sdk/resources/messages'
+} from '@anthropic-ai/sdk/resources/index.mjs'
+import { MessageCreateParamsStreaming } from '@anthropic-ai/sdk/src/resources/beta/index.js'
+import { ContentBlock } from '@anthropic-ai/sdk/src/resources/index.js'
 import { ChatCompletionMessageToolCall } from 'openai/resources/index'
 
 import {
@@ -22,6 +24,7 @@ import {
 import {
   CompletionResponse,
   CompletionResponseChunk,
+  ConfigOptions,
   StreamCompletionResponse,
 } from '../userTypes/index.js'
 import { BaseHandler } from './base.js'
@@ -67,7 +70,7 @@ export const createCompletionResponseNonStreaming = (
 }
 
 export async function* createCompletionResponseStreaming(
-  response: MessageStream,
+  response: BetaMessageStream,
   created: number
 ): StreamCompletionResponse {
   let message: Message | undefined
@@ -82,6 +85,7 @@ export async function* createCompletionResponseStreaming(
     if (chunk.type === 'message_start') {
       message = chunk.message
       // Yield the first element
+
       yield {
         choices: [
           {
@@ -98,10 +102,6 @@ export async function* createCompletionResponseStreaming(
         id: message.id,
         object: 'chat.completion.chunk',
       }
-    }
-
-    if (message === undefined) {
-      throw new InvariantError(`Message is undefined.`)
     }
 
     let newStopReason: Message['stop_reason'] | undefined
@@ -154,12 +154,17 @@ export async function* createCompletionResponseStreaming(
           ],
         }
       } else {
+        const betaTextDelta = chunk.delta as BetaTextDelta
         delta = {
-          content: chunk.delta.text,
+          content: betaTextDelta.text,
         }
       }
     } else if (chunk.type === 'message_delta') {
       newStopReason = chunk.delta.stop_reason
+    }
+
+    if (message === undefined) {
+      throw new InvariantError(`Message is undefined.`)
     }
 
     const stopReason =
@@ -191,7 +196,7 @@ const isTextBlock = (contentBlock: ContentBlock): contentBlock is TextBlock => {
 
 const isToolUseBlock = (
   contentBlock: ContentBlock
-): contentBlock is ToolUseBlock => {
+): contentBlock is Anthropic.Messages.ToolUseBlock => {
   return contentBlock.type === 'tool_use'
 }
 
@@ -283,7 +288,8 @@ const toFinishReasonNonStreaming = (
 
 export const convertToolParams = (
   toolChoice: CompletionParams['tool_choice'],
-  tools: CompletionParams['tools']
+  tools: CompletionParams['tools'],
+  opts?: ConfigOptions
 ): {
   toolChoice: MessageCreateParamsNonStreaming['tool_choice']
   tools: MessageCreateParamsNonStreaming['tools']
@@ -298,6 +304,11 @@ export const convertToolParams = (
         name: tool.function.name,
         description: tool.function.description,
         input_schema: { type: 'object', ...tool.function.parameters },
+        ...(opts?.anthropic?.caching?.tools && {
+          cache_control: {
+            type: 'ephemeral',
+          },
+        }),
       }
     }
   )
@@ -347,10 +358,18 @@ export const getDefaultMaxTokens = (model: string): number => {
 }
 
 export const convertMessages = async (
-  messages: CompletionParams['messages']
+  messages: CompletionParams['messages'],
+  opts?: ConfigOptions
 ): Promise<{
   messages: MessageCreateParamsNonStreaming['messages']
   systemMessage: string | undefined
+  systemMessageWithCache?: Array<{
+    type: 'text'
+    text: string
+    cache_control?: {
+      type: 'ephemeral'
+    }
+  }>
 }> => {
   const output: MessageCreateParamsNonStreaming['messages'] = []
   const clonedMessages = structuredClone(messages)
@@ -407,6 +426,11 @@ export const convertMessages = async (
         tool_use_id: message.tool_call_id,
         content: message.content,
         type: 'tool_result',
+        ...(opts?.anthropic?.caching?.toolUse && {
+          cache_control: {
+            type: 'ephemeral',
+          },
+        }),
       }
       currentParams.push(toolResult)
     } else if (message.role === 'assistant') {
@@ -414,6 +438,11 @@ export const convertMessages = async (
         currentParams.push({
           text: message.content,
           type: 'text',
+          ...(opts?.anthropic?.caching?.messages && {
+            cache_control: {
+              type: 'ephemeral',
+            },
+          }),
         })
       }
 
@@ -425,6 +454,11 @@ export const convertMessages = async (
               input: JSON.parse(toolCall.function.arguments),
               name: toolCall.function.name,
               type: 'tool_use',
+              ...(opts?.anthropic?.caching?.toolUse && {
+                cache_control: {
+                  type: 'ephemeral',
+                },
+              }),
             }
           })
         currentParams.push(...convertedContent)
@@ -437,6 +471,11 @@ export const convertMessages = async (
       currentParams.push({
         type: 'text',
         text,
+        ...(opts?.anthropic?.caching?.messages && {
+          cache_control: {
+            type: 'ephemeral',
+          },
+        }),
       })
     } else if (Array.isArray(message.content)) {
       const convertedContent: Array<TextBlockParam | ImageBlockParam> =
@@ -448,6 +487,11 @@ export const convertMessages = async (
               return {
                 type: 'text',
                 text,
+                ...(opts?.anthropic?.caching?.messages && {
+                  cache_control: {
+                    type: 'ephemeral',
+                  },
+                }),
               }
             } else {
               const parsedImage = await fetchThenParseImage(e.image_url.url)
@@ -458,6 +502,11 @@ export const convertMessages = async (
                   media_type: parsedImage.mimeType,
                   type: 'base64',
                 },
+                ...(opts?.anthropic?.caching?.images && {
+                  cache_control: {
+                    type: 'ephemeral',
+                  },
+                }),
               }
             }
           })
@@ -475,7 +524,31 @@ export const convertMessages = async (
     })
   }
 
-  return { messages: output, systemMessage }
+  let systemMessageWithCache:
+    | Array<{
+        type: 'text'
+        text: string
+        cache_control?: {
+          type: 'ephemeral'
+        }
+      }>
+    | undefined
+
+  if (systemMessage) {
+    systemMessageWithCache = [
+      {
+        type: 'text',
+        text: systemMessage,
+        ...(opts?.anthropic?.caching?.systemMessage && {
+          cache_control: {
+            type: 'ephemeral',
+          },
+        }),
+      },
+    ]
+  }
+
+  return { messages: output, systemMessage, systemMessageWithCache }
 }
 
 export const convertStopSequences = (
@@ -556,10 +629,12 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
           // 0 to 2.
           body.temperature / 2
         : undefined
-    const { messages, systemMessage } = await convertMessages(body.messages)
+    const { messages, systemMessage, systemMessageWithCache } =
+      await convertMessages(body.messages, this.opts)
     const { toolChoice, tools } = convertToolParams(
       body.tool_choice,
-      body.tools
+      body.tools,
+      this.opts
     )
 
     if (stream === true) {
@@ -571,12 +646,12 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         temperature,
         top_p: topP,
         stream,
-        system: systemMessage,
+        system: systemMessageWithCache ?? systemMessage,
         tools,
         tool_choice: toolChoice,
       }
       const created = getTimestamp()
-      const response = client.messages.stream(convertedBody)
+      const response = client.beta.messages.stream(convertedBody)
 
       return createCompletionResponseStreaming(response, created)
     } else {
@@ -587,13 +662,13 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         stop_sequences: stopSequences,
         temperature,
         top_p: topP,
-        system: systemMessage,
+        system: systemMessageWithCache ?? systemMessage,
         tools,
         tool_choice: toolChoice,
       }
 
       const created = getTimestamp()
-      const response = await client.messages.create(convertedBody)
+      const response = await client.beta.messages.create(convertedBody)
       return createCompletionResponseNonStreaming(
         response,
         created,
