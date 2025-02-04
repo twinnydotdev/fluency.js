@@ -85,6 +85,7 @@ export async function* createCompletionResponseStreaming(
     if (chunk.type === 'message_start') {
       message = chunk.message
       // Yield the first element
+
       yield {
         choices: [
           {
@@ -160,6 +161,10 @@ export async function* createCompletionResponseStreaming(
       }
     } else if (chunk.type === 'message_delta') {
       newStopReason = chunk.delta.stop_reason
+    }
+
+    if (message === undefined) {
+      throw new InvariantError(`Message is undefined.`)
     }
 
     const stopReason =
