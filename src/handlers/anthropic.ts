@@ -1,12 +1,10 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { BetaMessageStream } from '@anthropic-ai/sdk/lib/BetaMessageStream.mjs'
-import { MessageCreateParamsStreaming } from '@anthropic-ai/sdk/resources/beta/index.js'
 import {
   BetaTextBlockParam,
   BetaTextDelta,
   MessageCreateParamsNonStreaming,
 } from '@anthropic-ai/sdk/resources/beta/index.mjs'
-import { ContentBlock } from '@anthropic-ai/sdk/resources/index.js'
 import {
   ImageBlockParam,
   Message,
@@ -15,6 +13,8 @@ import {
   ToolResultBlockParam,
   ToolUseBlockParam,
 } from '@anthropic-ai/sdk/resources/index.mjs'
+import { MessageCreateParamsStreaming } from '@anthropic-ai/sdk/src/resources/beta/index.js'
+import { ContentBlock } from '@anthropic-ai/sdk/src/resources/index.js'
 import { ChatCompletionMessageToolCall } from 'openai/resources/index'
 
 import {
