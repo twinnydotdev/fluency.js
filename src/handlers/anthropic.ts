@@ -24,7 +24,6 @@ import {
 import {
   CompletionResponse,
   CompletionResponseChunk,
-  ConfigOptions,
   StreamCompletionResponse,
 } from '../userTypes/index.js'
 import { BaseHandler } from './base.js'
@@ -288,8 +287,7 @@ const toFinishReasonNonStreaming = (
 
 export const convertToolParams = (
   toolChoice: CompletionParams['tool_choice'],
-  tools: CompletionParams['tools'],
-  opts?: ConfigOptions
+  tools: CompletionParams['tools']
 ): {
   toolChoice: MessageCreateParamsNonStreaming['tool_choice']
   tools: MessageCreateParamsNonStreaming['tools']
@@ -304,11 +302,6 @@ export const convertToolParams = (
         name: tool.function.name,
         description: tool.function.description,
         input_schema: { type: 'object', ...tool.function.parameters },
-        ...(opts?.anthropic?.caching?.tools && {
-          cache_control: {
-            type: 'ephemeral',
-          },
-        }),
       }
     }
   )
@@ -358,18 +351,10 @@ export const getDefaultMaxTokens = (model: string): number => {
 }
 
 export const convertMessages = async (
-  messages: CompletionParams['messages'],
-  opts?: ConfigOptions
+  messages: CompletionParams['messages']
 ): Promise<{
   messages: MessageCreateParamsNonStreaming['messages']
   systemMessage: string | undefined
-  systemMessageWithCache?: Array<{
-    type: 'text'
-    text: string
-    cache_control?: {
-      type: 'ephemeral'
-    }
-  }>
 }> => {
   const output: MessageCreateParamsNonStreaming['messages'] = []
   const clonedMessages = structuredClone(messages)
@@ -426,11 +411,6 @@ export const convertMessages = async (
         tool_use_id: message.tool_call_id,
         content: message.content,
         type: 'tool_result',
-        ...(opts?.anthropic?.caching?.toolUse && {
-          cache_control: {
-            type: 'ephemeral',
-          },
-        }),
       }
       currentParams.push(toolResult)
     } else if (message.role === 'assistant') {
@@ -438,7 +418,7 @@ export const convertMessages = async (
         currentParams.push({
           text: message.content,
           type: 'text',
-          ...(opts?.anthropic?.caching?.messages && {
+          ...(message.cache_control && {
             cache_control: {
               type: 'ephemeral',
             },
@@ -454,11 +434,6 @@ export const convertMessages = async (
               input: JSON.parse(toolCall.function.arguments),
               name: toolCall.function.name,
               type: 'tool_use',
-              ...(opts?.anthropic?.caching?.toolUse && {
-                cache_control: {
-                  type: 'ephemeral',
-                },
-              }),
             }
           })
         currentParams.push(...convertedContent)
@@ -471,7 +446,7 @@ export const convertMessages = async (
       currentParams.push({
         type: 'text',
         text,
-        ...(opts?.anthropic?.caching?.messages && {
+        ...(message.cache_control && {
           cache_control: {
             type: 'ephemeral',
           },
@@ -487,7 +462,7 @@ export const convertMessages = async (
               return {
                 type: 'text',
                 text,
-                ...(opts?.anthropic?.caching?.messages && {
+                ...(message.cache_control && {
                   cache_control: {
                     type: 'ephemeral',
                   },
@@ -502,11 +477,6 @@ export const convertMessages = async (
                   media_type: parsedImage.mimeType,
                   type: 'base64',
                 },
-                ...(opts?.anthropic?.caching?.images && {
-                  cache_control: {
-                    type: 'ephemeral',
-                  },
-                }),
               }
             }
           })
@@ -524,31 +494,7 @@ export const convertMessages = async (
     })
   }
 
-  let systemMessageWithCache:
-    | Array<{
-        type: 'text'
-        text: string
-        cache_control?: {
-          type: 'ephemeral'
-        }
-      }>
-    | undefined
-
-  if (systemMessage) {
-    systemMessageWithCache = [
-      {
-        type: 'text',
-        text: systemMessage,
-        ...(opts?.anthropic?.caching?.systemMessage && {
-          cache_control: {
-            type: 'ephemeral',
-          },
-        }),
-      },
-    ]
-  }
-
-  return { messages: output, systemMessage, systemMessageWithCache }
+  return { messages: output, systemMessage }
 }
 
 export const convertStopSequences = (
@@ -629,12 +575,10 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
           // 0 to 2.
           body.temperature / 2
         : undefined
-    const { messages, systemMessage, systemMessageWithCache } =
-      await convertMessages(body.messages, this.opts)
+    const { messages, systemMessage } = await convertMessages(body.messages)
     const { toolChoice, tools } = convertToolParams(
       body.tool_choice,
-      body.tools,
-      this.opts
+      body.tools
     )
 
     if (stream === true) {
@@ -646,7 +590,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         temperature,
         top_p: topP,
         stream,
-        system: systemMessageWithCache ?? systemMessage,
+        system: systemMessage,
         tools,
         tool_choice: toolChoice,
       }
@@ -662,7 +606,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         stop_sequences: stopSequences,
         temperature,
         top_p: topP,
-        system: systemMessageWithCache ?? systemMessage,
+        system: systemMessage,
         tools,
         tool_choice: toolChoice,
       }
