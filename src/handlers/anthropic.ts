@@ -607,7 +607,6 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         tool_choice: toolChoice,
       }
       const created = getTimestamp()
-      console.log(convertedBody)
       const response = client.beta.messages.stream(convertedBody)
 
       return createCompletionResponseStreaming(response, created)
