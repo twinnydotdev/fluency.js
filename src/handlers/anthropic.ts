@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { BetaMessageStream } from '@anthropic-ai/sdk/lib/BetaMessageStream.mjs'
 import {
+  BetaTextBlockParam,
   BetaTextDelta,
   MessageCreateParamsNonStreaming,
 } from '@anthropic-ai/sdk/resources/beta/index.mjs'
@@ -354,7 +355,7 @@ export const convertMessages = async (
   messages: CompletionParams['messages']
 ): Promise<{
   messages: MessageCreateParamsNonStreaming['messages']
-  systemMessage: string | undefined
+  systemMessage: string | undefined | BetaTextBlockParam[]
 }> => {
   const output: MessageCreateParamsNonStreaming['messages'] = []
   const clonedMessages = structuredClone(messages)
@@ -363,10 +364,25 @@ export const convertMessages = async (
   // message. The returned element will be used for Anthropic's `system` parameter. We only pop the
   // system message if it's the first element in the array so that the order of the messages remains
   // unchanged.
-  let systemMessage: string | undefined
-  if (clonedMessages.length > 0 && clonedMessages[0].role === 'system') {
-    systemMessage = clonedMessages[0].content
-    clonedMessages.shift()
+  let systemMessage: string | undefined | BetaTextBlockParam[]
+
+  const systemMessages = clonedMessages.filter(
+    (message) => message.role === 'system'
+  )
+
+  if (
+    systemMessages.length &&
+    systemMessages.some((message) => message.cache_control)
+  ) {
+    systemMessage = systemMessages.map((s) => ({
+      text: s.content as string,
+      type: 'text',
+      cache_control: {
+        type: 'ephemeral',
+      },
+    }))
+  } else if (systemMessages.length > 0) {
+    systemMessage = systemMessages[0].content
   }
 
   // Anthropic requires that the first message in the array is from a 'user' role, so we inject a
@@ -438,14 +454,10 @@ export const convertMessages = async (
           })
         currentParams.push(...convertedContent)
       }
-    } else if (typeof message.content === 'string') {
-      const text =
-        message.role === 'system'
-          ? `System: ${message.content}`
-          : message.content
+    } else if (typeof message.content === 'string' && message.role === 'user') {
       currentParams.push({
         type: 'text',
-        text,
+        text: message.content,
         ...(message.cache_control && {
           cache_control: {
             type: 'ephemeral',
@@ -457,11 +469,9 @@ export const convertMessages = async (
         await Promise.all(
           message.content.map(async (e) => {
             if (e.type === 'text') {
-              const text =
-                message.role === 'system' ? `System: ${e.text}` : e.text
               return {
                 type: 'text',
-                text,
+                text: e.text,
                 ...(message.cache_control && {
                   cache_control: {
                     type: 'ephemeral',
@@ -564,6 +574,8 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
       )
     }
 
+    console.log(body)
+
     const stream = typeof body.stream === 'boolean' ? body.stream : undefined
     const maxTokens = body.max_tokens ?? getDefaultMaxTokens(body.model)
     const client = new Anthropic({ apiKey: getApiKey(this.opts.apiKey)! })
@@ -595,6 +607,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         tool_choice: toolChoice,
       }
       const created = getTimestamp()
+      console.log(convertedBody)
       const response = client.beta.messages.stream(convertedBody)
 
       return createCompletionResponseStreaming(response, created)

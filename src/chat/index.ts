@@ -5,6 +5,7 @@ import { models } from '../models.js'
 import {
   CompletionResponse,
   ConfigOptions,
+  MessageWithCache,
   StreamCompletionResponse,
 } from '../userTypes/index.js'
 
@@ -48,15 +49,6 @@ type ProviderModelMap = {
   openrouter: OpenRouterModel
   'openai-compatible': OpenAICompatibleModel
 }
-
-type CacheControl = {
-  cache_control?: {
-    type: 'ephemeral'
-  }
-}
-
-type MessageWithCache = ChatCompletionCreateParamsBase['messages'][number] &
-  CacheControl
 
 type CompletionBase<P extends LLMProvider> = Pick<
   ChatCompletionCreateParamsBase,
