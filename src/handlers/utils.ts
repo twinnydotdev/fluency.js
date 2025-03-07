@@ -10,6 +10,7 @@ import { AnthropicHandler } from './anthropic.js'
 import { BaseHandler } from './base.js'
 import { BedrockHandler } from './bedrock.js'
 import { CohereHandler } from './cohere.js'
+import { DeepseekHandler } from './deepseek.js'
 import { GeminiHandler } from './gemini.js'
 import { GroqHandler } from './groq.js'
 import { MistralHandler } from './mistral.js'
@@ -121,7 +122,7 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.openrouter.supportsStreaming
     ),
   ['deepseek']: (opts: ConfigOptions) =>
-    new OpenAICompatibleHandler(
+    new DeepseekHandler(
       opts,
       models.deepseek.models,
       models.deepseek.supportsJSON,
