@@ -1,4 +1,4 @@
-# Eloquent.js
+# fluency.js
 
 Integrate 200+ LLMs with one TypeScript SDK using OpenAI's format. Free and open source. No proxy server required.
 
@@ -32,7 +32,7 @@ This project is a fork of [token.js](https://github.com/token-js/token.js).
 ### Installation
 
 ```bash
-npm install eloquent.js
+npm install fluency.js
 ```
 
 ### Usage
@@ -43,7 +43,7 @@ Import the Token.js client and call the `create` function with a prompt in OpenA
 OPENAI_API_KEY=<openai api key>
 ```
 ```ts
-import { TokenJS } from 'eloquent.js'
+import { TokenJS } from 'fluency.js'
 
 // Create the Token.js client
 const tokenjs = new TokenJS()
@@ -103,7 +103,7 @@ OPENAI_COMPATIBLE_API_KEY=
 Token.js supports streaming responses for all providers that offer it.
 
 ```ts
-import { TokenJS } from 'eloquent.js'
+import { TokenJS } from 'fluency.js'
 
 const tokenjs = new TokenJS()
 
@@ -132,7 +132,7 @@ main()
 Token.js supports the function calling tool for all providers and models that offer it.
 
 ```ts
-import { TokenJS, ChatCompletionTool } from 'eloquent.js'
+import { TokenJS, ChatCompletionTool } from 'fluency.js'
 
 const tokenjs = new TokenJS()
 
@@ -184,7 +184,7 @@ Token.js allows you to extend the predefined model list using the `extendModelLi
 4. Adding experimental or beta models during testing
 
 ```ts
-import { TokenJS } from 'eloquent.js'
+import { TokenJS } from 'fluency.js'
 
 // Example in 2 steps: Adding AWS Bedrock Claude models with region prefix
 const tokenjs = new TokenJS();
@@ -257,4 +257,4 @@ Please let us know if there's any way that we can improve Token.js by opening an
 
 ## License
 
-Token.js is free and open source software licensed under [MIT](https://github.com/token-js/eloquent.js/blob/main/LICENSE).
+Token.js is free and open source software licensed under [MIT](https://github.com/token-js/fluency.js/blob/main/LICENSE).

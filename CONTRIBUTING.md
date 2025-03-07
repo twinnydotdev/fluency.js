@@ -3,8 +3,8 @@
 Thanks for your interest in improving Token.js!
 
 We appreciate support in the following areas:
-- Reporting issues. If you notice any bugs or have suggestions for new features, please [open an issue](https://github.com/token-js/eloquent.js/issues/new).
-- Fixing and responding to existing issues. You can start off with those tagged ["good first issue"](https://github.com/token-js/eloquent.js/labels/good%20first%20issue), which are meant as introductory issues for external contributors.
+- Reporting issues. If you notice any bugs or have suggestions for new features, please [open an issue](https://github.com/token-js/fluency.js/issues/new).
+- Fixing and responding to existing issues. You can start off with those tagged ["good first issue"](https://github.com/token-js/fluency.js/labels/good%20first%20issue), which are meant as introductory issues for external contributors.
 - Supporting new providers. We recommend first opening an issue and contacting the maintainers to get guidance on this as we have not yet documented the complete process of supporting new providers.
 
 ## Development Quickstart
@@ -45,7 +45,7 @@ git commit -m "fix: linter suggestions"
 pnpm docs:update
 ```
 
-> You'll generally only need to update to docs if you [modify the models object](https://github.com/token-js/eloquent.js/blob/main/src/models.ts).
+> You'll generally only need to update to docs if you [modify the models object](https://github.com/token-js/fluency.js/blob/main/src/models.ts).
 
 ### Add a changeset
 
