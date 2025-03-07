@@ -12,7 +12,7 @@ OPENAI_COMPATIBLE_API_KEY=
 {% endcode %}
 
 ```typescript
-import { TokenJS } from 'eloquent.js'
+import { TokenJS } from 'fluency.js'
 
 // Create the Token.js client and specify the baseURL for the OpenAI v1 API compatible provider
 const tokenjs = new TokenJS({
