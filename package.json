@@ -1,9 +1,9 @@
 {
-  "name": "token.js",
+  "name": "eloquent.js",
   "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/token-js/token.js"
+    "url": "https://github.com/twinnydotdev/eloquent.js"
   },
   "description": "Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.",
   "main": "dist/index.cjs",
