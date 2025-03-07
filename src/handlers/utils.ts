@@ -119,6 +119,16 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.openrouter.supportsN,
       models.openrouter.supportsStreaming
     ),
+  ['deepseek']: (opts: ConfigOptions) =>
+    new OpenAICompatibleHandler(
+      opts,
+      models.deepseek.models,
+      models.deepseek.supportsJSON,
+      models.deepseek.supportsImages,
+      models.deepseek.supportsToolCalls,
+      models.deepseek.supportsN,
+      models.deepseek.supportsStreaming
+    ),
   ['openai-compatible']: (opts: ConfigOptions) =>
     new OpenAICompatibleHandler(
       opts,

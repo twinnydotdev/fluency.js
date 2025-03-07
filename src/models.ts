@@ -136,6 +136,15 @@ export const models = {
     supportsN: true,
     generateDocs: true,
   },
+  deepseek: {
+    models: ['deepseek-chat', 'deepseek-reasoner'],
+    supportsCompletion: true,
+    supportsStreaming: ['deepseek-chat', 'deepseek-reasoner'],
+    supportsJSON: [] as const,
+    supportsImages: [] as const,
+    supportsN: false,
+    supportsToolCalls: [] as const,
+  },
   anthropic: {
     models: [
       'claude-3-7-sonnet-latest',
