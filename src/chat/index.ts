@@ -11,6 +11,7 @@ import {
 
 export type OpenAIModel = (typeof models.openai.models)[number]
 export type AI21Model = (typeof models.ai21.models)[number]
+export type DeepseekModel = (typeof models.deepseek.models)[number]
 export type AnthropicModel = (typeof models.anthropic.models)[number]
 export type GeminiModel = (typeof models.gemini.models)[number]
 export type CohereModel = (typeof models.cohere.models)[number]
@@ -39,6 +40,7 @@ export type LLMProvider = keyof typeof models
 type ProviderModelMap = {
   openai: OpenAIModel
   ai21: AI21Model
+  deepseek: DeepseekModel
   anthropic: AnthropicModel
   gemini: GeminiModel
   cohere: CohereModel
