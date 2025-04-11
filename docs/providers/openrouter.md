@@ -11,7 +11,7 @@ OPENROUTER_API_KEY=
 {% endcode %}
 
 ```typescript
-import { TokenJS } from 'token.js'
+import { TokenJS } from 'fluency.js'
 
 // Create the Token.js client
 const tokenjs = new TokenJS()

@@ -1,9 +1,9 @@
 {
-  "name": "token.js",
-  "version": "0.6.0",
+  "name": "fluency.js",
+  "version": "1.0.4",
   "repository": {
     "type": "git",
-    "url": "https://github.com/token-js/token.js"
+    "url": "https://github.com/twinnydotdev/fluency.js"
   },
   "packageManager": "pnpm@8.6.12",
   "description": "Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.",

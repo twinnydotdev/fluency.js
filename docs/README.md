@@ -34,25 +34,25 @@ description: >-
 {% tabs %}
 {% tab title="npm" %}
 ```bash
-npm install token.js
+npm install fluency.js
 ```
 {% endtab %}
 
 {% tab title="pnpm" %}
 ```bash
-pnpm install token.js
+pnpm install fluency.js
 ```
 {% endtab %}
 
 {% tab title="yarn" %}
 ```bash
-yarn add token.js
+yarn add fluency.js
 ```
 {% endtab %}
 
 {% tab title="bun" %}
 ```bash
-bun add token.js
+bun add fluency.js
 ```
 {% endtab %}
 {% endtabs %}
@@ -71,7 +71,7 @@ OPENAI_API_KEY=<openai api key>
 
 {% code fullWidth="false" %}
 ```ts
-import { TokenJS } from 'token.js'
+import { TokenJS } from 'fluency.js'
 
 // Create the Token.js client
 const tokenjs = new TokenJS()
@@ -105,7 +105,7 @@ ANTHROPIC_API_KEY=<anthropic api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS } from 'token.js'
+import { TokenJS } from 'fluency.js'
 
 // Create the Token.js client
 const tokenjs = new TokenJS()
@@ -138,7 +138,7 @@ GEMINI_API_KEY=<gemini api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS } from 'token.js'
+import { TokenJS } from 'fluency.js'
 
 // Create the Token.js client
 const tokenjs = new TokenJS()
@@ -173,7 +173,7 @@ AWS_SECRET_ACCESS_KEY=<aws secret access key>
 {% endcode %}
 
 ```typescript
-import { TokenJS } from 'token.js'
+import { TokenJS } from 'fluency.js'
 
 // Create the Token.js client
 const tokenjs = new TokenJS()
@@ -206,7 +206,7 @@ COHERE_API_KEY=<cohere api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS } from 'token.js'
+import { TokenJS } from 'fluency.js'
 
 // Create the Token.js client
 const tokenjs = new TokenJS()
@@ -239,7 +239,7 @@ MISTRAL_API_KEY=<mistral api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS } from 'token.js'
+import { TokenJS } from 'fluency.js'
 
 // Create the Token.js client
 const tokenjs = new TokenJS()
@@ -272,7 +272,7 @@ OPENROUTER_API_KEY=<openrouter api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS } from 'token.js'
+import { TokenJS } from 'fluency.js'
 
 // Create the Token.js client
 const tokenjs = new TokenJS()
@@ -334,7 +334,7 @@ OPENAI_COMPATIBLE_API_KEY=
 Token.js supports streaming responses for all providers that offer it.
 
 ```ts
-import { TokenJS } from 'token.js'
+import { TokenJS } from 'fluency.js'
 
 const tokenjs = new TokenJS()
 
@@ -363,7 +363,7 @@ main()
 Token.js supports the function calling tool for all providers and models that offer it.
 
 ```ts
-import { TokenJS, ChatCompletionTool } from 'token.js'
+import { TokenJS, ChatCompletionTool } from 'fluency.js'
 
 const tokenjs = new TokenJS()
 
@@ -435,4 +435,4 @@ This table provides an overview of the features that Token.js supports from each
 
 ## License
 
-Token.js is free and open source software licensed under [MIT](https://github.com/token-js/token.js/blob/main/LICENSE).
+Token.js is free and open source software licensed under [MIT](https://github.com/token-js/fluency.js/blob/main/LICENSE).
