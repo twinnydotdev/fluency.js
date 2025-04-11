@@ -31,7 +31,6 @@ import { BaseHandler } from './base.js'
 import { InputError, InvariantError } from './types.js'
 import {
   consoleWarn,
-  convertMessageContentToString,
   fetchThenParseImage,
   getTimestamp,
   isEmptyObject,
@@ -98,6 +97,11 @@ export async function* createCompletionResponseStreaming(
             },
           },
         ],
+        usage: {
+          prompt_tokens: 0,
+          completion_tokens: 0,
+          total_tokens: 0,
+        },
         created,
         model: message.model,
         id: message.id,
@@ -490,7 +494,7 @@ export const convertMessages = async (
                     type: 'ephemeral',
                   },
                 }),
-              }
+              } as TextBlockParam
             } else {
               const parsedImage = await fetchThenParseImage(e.image_url.url)
               return {
