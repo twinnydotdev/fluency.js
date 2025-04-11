@@ -97,6 +97,11 @@ export async function* createCompletionResponseStreaming(
             },
           },
         ],
+        usage: {
+          prompt_tokens: 0,
+          completion_tokens: 0,
+          total_tokens: 0,
+        },
         created,
         model: message.model,
         id: message.id,
@@ -252,12 +257,14 @@ const toChatCompletionChoiceMessage = (
     const messageContent = content.every(isToolUseBlock) ? null : ''
     return {
       role,
+      refusal: null,
       content: messageContent,
       tool_calls: toolCalls,
     }
   } else {
     return {
       role,
+      refusal: null,
       content: textBlocks.map((textBlock) => textBlock.text).join('\n'),
       tool_calls: toolCalls,
     }
@@ -487,7 +494,7 @@ export const convertMessages = async (
                     type: 'ephemeral',
                   },
                 }),
-              }
+              } as TextBlockParam
             } else {
               const parsedImage = await fetchThenParseImage(e.image_url.url)
               return {
@@ -497,7 +504,7 @@ export const convertMessages = async (
                   media_type: parsedImage.mimeType,
                   type: 'base64',
                 },
-              }
+              } as ImageBlockParam
             }
           })
         )
