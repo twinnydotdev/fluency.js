@@ -12,6 +12,8 @@ export const models = {
   openai: {
     models: [
       'gpt-4.1',
+      'gpt-4.1-mini',
+      'gpt-4.1-nano',
       'gpt-4.5-preview',
       'gpt-4.5-preview-2025-02-27',
       'gpt-4o',
@@ -46,6 +48,8 @@ export const models = {
     supportsCompletion: true,
     supportsStreaming: [
       'gpt-4.1',
+      'gpt-4.1-mini',
+      'gpt-4.1-nano',
       'gpt-4.5-preview',
       'gpt-4.5-preview-2025-02-27',
       'gpt-4o',
@@ -75,6 +79,8 @@ export const models = {
     ] as const,
     supportsJSON: [
       'gpt-4.1',
+      'gpt-4.1-mini',
+      'gpt-4.1-nano',
       'gpt-4.5-preview',
       'gpt-4.5-preview-2025-02-27',
       'gpt-4o',
@@ -94,6 +100,8 @@ export const models = {
     ] as const,
     supportsImages: [
       'gpt-4.1',
+      'gpt-4.1-mini',
+      'gpt-4.1-nano',
       'gpt-4.5-preview',
       'gpt-4.5-preview-2025-02-27',
       'gpt-4o',
@@ -109,6 +117,8 @@ export const models = {
     ] as const,
     supportsToolCalls: [
       'gpt-4.1',
+      'gpt-4.1-mini',
+      'gpt-4.1-nano',
       'gpt-4.5-preview',
       'gpt-4.5-preview-2025-02-27',
       'gpt-4o',
