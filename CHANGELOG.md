@@ -1,5 +1,17 @@
 # Token.js
 
+## 0.7.1
+
+### Patch Changes
+
+- 2fc6edd: Fix: resolve error where new anthropic models do not work due to hardcoded max token limit
+
+## 0.7.0
+
+### Minor Changes
+
+- 9b53159: Add gpt 4.1 models
+
 ## 0.6.0
 
 ### Minor Changes
