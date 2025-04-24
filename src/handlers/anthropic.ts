@@ -620,7 +620,6 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
           // 0 to 2.
           body.temperature / 2
         : undefined
-    console.log(body.messages)
     const { messages, systemMessage } = await convertMessages(body.messages)
     const { toolChoice, tools } = convertToolParams(
       body.tool_choice,
@@ -641,7 +640,6 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         tool_choice: toolChoice,
       }
       const created = getTimestamp()
-      console.log(convertedBody)
       const response = client.beta.messages.stream(convertedBody)
 
       return createCompletionResponseStreaming(response, created)
