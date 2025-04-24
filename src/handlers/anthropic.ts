@@ -457,6 +457,24 @@ export const convertMessages = async (
             },
           }),
         })
+      } else if (Array.isArray(message.content)) {
+        const convertedContent: Array<TextBlockParam | ImageBlockParam> =
+          await Promise.all(
+            message.content.map(async (e) => {
+              if (e.type === 'text') {
+                return {
+                  type: 'text',
+                  text: e.text,
+                  ...(message.cache_control && {
+                    cache_control: {
+                      type: 'ephemeral',
+                    },
+                  }),
+                } as TextBlockParam
+              }
+            })
+          )
+        currentParams.push(...convertedContent)
       }
 
       if (Array.isArray(message.tool_calls)) {
@@ -602,6 +620,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
           // 0 to 2.
           body.temperature / 2
         : undefined
+    console.log(body.messages)
     const { messages, systemMessage } = await convertMessages(body.messages)
     const { toolChoice, tools } = convertToolParams(
       body.tool_choice,
@@ -622,6 +641,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         tool_choice: toolChoice,
       }
       const created = getTimestamp()
+      console.log(convertedBody)
       const response = client.beta.messages.stream(convertedBody)
 
       return createCompletionResponseStreaming(response, created)
