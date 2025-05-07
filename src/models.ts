@@ -220,6 +220,8 @@ export const models = {
   },
   gemini: {
     models: [
+      'gemini-2.5-flash-preview-04-17',
+      'gemini-2.5-pro-preview-05-06',
       'gemini-2.5-pro-exp-03-25',
       'gemini-2.0-flash-001',
       'gemini-2.0-flash-lite-preview-02-05',
@@ -230,6 +232,8 @@ export const models = {
     ] as const,
     supportsCompletion: true,
     supportsStreaming: [
+      'gemini-2.5-flash-preview-04-17',
+      'gemini-2.5-pro-preview-05-06',
       'gemini-2.5-pro-exp-03-25',
       'gemini-2.0-flash-001',
       'gemini-2.0-flash-lite-preview-02-05',
@@ -239,6 +243,8 @@ export const models = {
       'gemini-1.0-pro',
     ] as const,
     supportsJSON: [
+      'gemini-2.5-flash-preview-04-17',
+      'gemini-2.5-pro-preview-05-06',
       'gemini-2.5-pro-exp-03-25',
       'gemini-2.0-flash-001',
       'gemini-2.0-flash-lite-preview-02-05',
@@ -247,6 +253,8 @@ export const models = {
       'gemini-1.5-flash-8b',
     ] as const,
     supportsImages: [
+      'gemini-2.5-flash-preview-04-17',
+      'gemini-2.5-pro-preview-05-06',
       'gemini-2.5-pro-exp-03-25',
       'gemini-2.0-flash-001',
       'gemini-2.0-flash-lite-preview-02-05',
@@ -255,6 +263,8 @@ export const models = {
       'gemini-1.5-flash-8b',
     ] as const,
     supportsToolCalls: [
+      'gemini-2.5-flash-preview-04-17',
+      'gemini-2.5-pro-preview-05-06',
       'gemini-2.5-pro-exp-03-25',
       'gemini-2.0-flash-001',
       'gemini-1.5-pro',
