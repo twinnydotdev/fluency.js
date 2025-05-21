@@ -473,43 +473,43 @@ export const models = {
   },
   groq: {
     models: [
+      'llama-3.3-70b-versatile',
       'llama-3.1-8b-instant',
       'llama3-8b-8192',
       'llama3-70b-8192',
       'mixtral-8x7b-32768',
       'gemma-7b-it',
       'gemma2-9b-it',
-      'llama-3.1-405b-reasoning',
     ] as const,
     supportsCompletion: true,
     supportsStreaming: [
+      'llama-3.3-70b-versatile',
       'llama-3.1-8b-instant',
       'llama3-8b-8192',
       'llama3-70b-8192',
       'mixtral-8x7b-32768',
       'gemma-7b-it',
       'gemma2-9b-it',
-      'llama-3.1-405b-reasoning',
     ] as const,
     // Groq claims that all of its models support JSON, but some of the weaker models either fail to
     // produce valid JSON or produce very low quality results for the following prompt: "Generate a
     // JSON that maps ten athletes to their jersey numbers". We removed these models from the list
     // to ensure that we only support models that reliably produce decent results.
     supportsJSON: [
+      'llama-3.3-70b-versatile',
       'llama-3.1-8b-instant',
       'llama3-70b-8192',
       'gemma-7b-it',
       'gemma2-9b-it',
       'llama3-8b-8192',
       'mixtral-8x7b-32768',
-      'llama-3.1-405b-reasoning',
     ] as const,
     supportsImages: [] as const,
     supportsToolCalls: [
+      'llama-3.3-70b-versatile',
       'llama-3.1-8b-instant',
       'llama3-8b-8192',
       'llama3-70b-8192',
-      'llama-3.1-405b-reasoning',
       'mixtral-8x7b-32768',
       'gemma2-9b-it',
     ] as const,
