@@ -135,16 +135,36 @@ export const models = {
     generateDocs: true,
   },
   deepseek: {
-    models: ['deepseek-chat', 'deepseek-reasoner', 'deepseek-coder', 'deepseek-vl'],
+    models: [
+      'deepseek-chat',
+      'deepseek-reasoner',
+      'deepseek-coder',
+      'deepseek-vl',
+    ],
     supportsCompletion: true,
-    supportsStreaming: ['deepseek-chat', 'deepseek-reasoner', 'deepseek-coder', 'deepseek-vl'],
-    supportsJSON: ['deepseek-chat', 'deepseek-reasoner', 'deepseek-coder'] as const,
+    supportsStreaming: [
+      'deepseek-chat',
+      'deepseek-reasoner',
+      'deepseek-coder',
+      'deepseek-vl',
+    ],
+    supportsJSON: [
+      'deepseek-chat',
+      'deepseek-reasoner',
+      'deepseek-coder',
+    ] as const,
     supportsImages: ['deepseek-vl'] as const,
     supportsN: false,
-    supportsToolCalls: ['deepseek-chat', 'deepseek-reasoner', 'deepseek-coder'] as const,
+    supportsToolCalls: [
+      'deepseek-chat',
+      'deepseek-reasoner',
+      'deepseek-coder',
+    ] as const,
   },
   anthropic: {
     models: [
+      'claude-3-7-sonnet-latest',
+      'claude-3-7-sonnet-20250219',
       'claude-3-5-sonnet-latest',
       'claude-3-5-sonnet-20240620',
       'claude-3-5-haiku-20241022',
@@ -155,6 +175,8 @@ export const models = {
     ] as const,
     supportsCompletion: true,
     supportsStreaming: [
+      'claude-3-7-sonnet-latest',
+      'claude-3-7-sonnet-20250219',
       'claude-3-5-sonnet-latest',
       'claude-3-5-sonnet-20240620',
       'claude-3-5-haiku-20241022',
@@ -164,6 +186,8 @@ export const models = {
       'claude-2.1',
     ] as const,
     supportsJSON: [
+      'claude-3-7-sonnet-latest',
+      'claude-3-7-sonnet-20250219',
       'claude-3-5-sonnet-latest',
       'claude-3-5-sonnet-20240620',
       'claude-3-5-haiku-20241022',
@@ -172,6 +196,8 @@ export const models = {
       'claude-3-haiku-20240307',
     ] as const,
     supportsImages: [
+      'claude-3-7-sonnet-latest',
+      'claude-3-7-sonnet-20250219',
       'claude-3-5-sonnet-latest',
       'claude-3-5-sonnet-20240620',
       'claude-3-opus-20240229',
@@ -180,6 +206,8 @@ export const models = {
       'claude-3-5-haiku-20241022',
     ] as const,
     supportsToolCalls: [
+      'claude-3-7-sonnet-latest',
+      'claude-3-7-sonnet-20250219',
       'claude-3-5-sonnet-latest',
       'claude-3-5-sonnet-20240620',
       'claude-3-5-haiku-20241022',
@@ -269,7 +297,12 @@ export const models = {
       'command-light-nightly',
       'aya',
     ] as const,
-    supportsJSON: ['command-r-plus', 'command-r', 'command-nightly', 'aya'] as const,
+    supportsJSON: [
+      'command-r-plus',
+      'command-r',
+      'command-nightly',
+      'aya',
+    ] as const,
     supportsImages: [] as const,
     supportsToolCalls: [
       'command-r-plus',

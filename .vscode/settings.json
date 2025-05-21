@@ -66,5 +66,6 @@
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
     }
-  }
+  },
+  "twinny.username": "richard"
 }
