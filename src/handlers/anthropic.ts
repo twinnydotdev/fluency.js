@@ -348,14 +348,14 @@ export const getDefaultMaxTokens = (model: string): number => {
     model === 'claude-3-opus-20240229' ||
     model === 'claude-3-sonnet-20240229' ||
     model === 'claude-3-haiku-20240307' ||
-    model === 'claude-2.1' ||
-    model === 'claude-2.0' ||
-    model === 'claude-instant-1.2'
+    model === 'claude-2.1'
   ) {
     return 4096
   }
 
   if (
+    model === 'claude-sonnet-4-20250514' ||
+    model === 'claude-opus-4-20250514' ||
     model === 'claude-3-5-sonnet-latest' ||
     model === 'claude-3-5-sonnet-20241022' ||
     model === 'claude-3-7-sonnet-latest' ||
