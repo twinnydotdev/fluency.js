@@ -196,7 +196,7 @@ export const models = {
     ] as const,
     supportsJSON: [
       'claude-opus-4-20250514',
-      'claude-opus-4-latest',
+      'claude-opus-4-20250514',
       'claude-3-7-sonnet-latest',
       'claude-3-7-sonnet-20250219',
       'claude-3-5-sonnet-latest',
@@ -208,7 +208,7 @@ export const models = {
     ] as const,
     supportsImages: [
       'claude-opus-4-20250514',
-      'claude-opus-4-latest',
+      'claude-opus-4-20250514',
       'claude-3-7-sonnet-latest',
       'claude-3-7-sonnet-20250219',
       'claude-3-5-sonnet-latest',
@@ -220,7 +220,7 @@ export const models = {
     ] as const,
     supportsToolCalls: [
       'claude-opus-4-20250514',
-      'claude-opus-4-latest',
+      'claude-opus-4-20250514',
       'claude-3-7-sonnet-latest',
       'claude-3-7-sonnet-20250219',
       'claude-3-5-sonnet-latest',
