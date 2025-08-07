@@ -38,6 +38,7 @@ export class OpenAIHandler extends BaseHandler<OpenAIModel> {
     delete params.provider
 
     if (body.stream) {
+      console.log(body)
       const stream = await openai.chat.completions.create(body)
       return streamOpenAI(stream)
     } else {
