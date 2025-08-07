@@ -354,6 +354,7 @@ export const getDefaultMaxTokens = (model: string): number => {
   }
 
   if (
+    model === 'claude-opus-4-1-20250805' ||
     model === 'claude-sonnet-4-20250514' ||
     model === 'claude-opus-4-20250514' ||
     model === 'claude-3-5-sonnet-latest' ||
